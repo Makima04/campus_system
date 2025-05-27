@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 定义日志文件的存储地址 -->
+    <property name="LOG_HOME" value="logs" />
+    
+    <!-- 定义日志格式 -->
+    <property name="CONSOLE_LOG_PATTERN" 
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
+    <property name="FILE_LOG_PATTERN" 
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 系统日志文件 -->
+    <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/campus-system.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/campus-system.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <!-- 错误日志文件 -->
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- 业务日志文件 -->
+    <appender name="FILE_BUSINESS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/business.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/business.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 安全日志文件 -->
+    <appender name="FILE_SECURITY" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/security.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/security.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 异步输出 -->
+    <appender name="ASYNC_INFO" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <appender-ref ref="FILE_INFO" />
+    </appender>
+
+    <appender name="ASYNC_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>256</queueSize>
+        <appender-ref ref="FILE_ERROR" />
+    </appender>
+
+    <appender name="ASYNC_BUSINESS" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <appender-ref ref="FILE_BUSINESS" />
+    </appender>
+
+    <appender name="ASYNC_SECURITY" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>256</queueSize>
+        <appender-ref ref="FILE_SECURITY" />
+    </appender>
+
+    <!-- 业务日志 -->
+    <logger name="com.example.campussysteam.module" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ASYNC_BUSINESS" />
+        <appender-ref ref="ASYNC_ERROR" />
+    </logger>
+
+    <!-- 安全日志 -->
+    <logger name="com.example.campussysteam.security" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ASYNC_SECURITY" />
+        <appender-ref ref="ASYNC_ERROR" />
+    </logger>
+
+    <!-- 根日志级别 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ASYNC_INFO" />
+        <appender-ref ref="ASYNC_ERROR" />
+    </root>
+
+    <!-- 开发环境配置 -->
+    <springProfile name="dev">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="ASYNC_INFO" />
+            <appender-ref ref="ASYNC_ERROR" />
+        </root>
+    </springProfile>
+
+    <!-- 生产环境配置 -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="ASYNC_INFO" />
+            <appender-ref ref="ASYNC_ERROR" />
+        </root>
+    </springProfile>
+</configuration> 
